@@ -8,7 +8,7 @@ int SW_pin = A2;  // Switch
 int X_pin = A0;  // Borne VAR X du Switch
 int Y_pin = A1;  // Borne VAR X du Switch
 int val_var_X = 0;
-int val_var_Y = 0;  
+int val_var_Y = 0;
 int init_var_X = 0;
 int init_var_Y = 0;
 int delaiA = 0;
@@ -17,24 +17,38 @@ int minDelay = 200;
 
 int ledPin = 13;  // LED Integree
 
+unsigned long previousLeftStep = 0;
 
 void setup()
 {
   pinMode(X_pin, INPUT);
   pinMode(Y_pin, INPUT);
   pinMode(SW_pin, INPUT);
-  
+
   pinMode(PulseA,OUTPUT);
   pinMode(DirA,OUTPUT);
   pinMode(ledPin, OUTPUT);
   pinMode(Slp, OUTPUT);
-  
+
   //Serial.begin (115200);
-  
+
   init_var_X = analogRead(X_pin);
   init_var_Y = analogRead(Y_pin);
 }
 
+(unsigned long) ComputeWheelStep((unsigned long) previousStep)
+{
+  freqY = val_var_Y - init_var_Y;
+  delaiA = 5000 - 10*abs(freqY);
+  unsigned long now = micros();
+  delaiAms = (unsigned long) delaiA;
+  if (now - previousStep >= delaiAms){
+    return now
+  }
+  else {
+    return previousStep
+  }
+}
 
 void loop()
 {
@@ -59,7 +73,7 @@ void loop()
       delayMicroseconds(minDelay);
       digitalWrite(PulseA,LOW);
     }
-    
+
     delayMicroseconds(minDelay);
   }
   else if (delaiA >= 2000){
@@ -88,6 +102,5 @@ void loop()
     delayMicroseconds(delaiA);
   }
   //Serial.println(freqY);
-  
-}
 
+}

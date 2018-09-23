@@ -14,10 +14,12 @@ int init_var_Y = 0;
 int delaiA = 0;
 int freqY = 0;
 int minDelay = 200;
+int maxDelay = 2000;
 
 int ledPin = 13;  // LED Integree
 
 unsigned long previousLeftStep = 0;
+bool previousLeftState = false;
 
 void setup()
 {
@@ -36,71 +38,42 @@ void setup()
   init_var_Y = analogRead(Y_pin);
 }
 
-(unsigned long) ComputeWheelStep((unsigned long) previousStep)
-{
+void ComputeWheelStep(){
+  // read joystick values
+  val_var_X = analogRead(X_pin);
+  val_var_Y = analogRead(Y_pin);
+  val_sw = analogRead(SW_pin);
+
+  // compute delay
   freqY = val_var_Y - init_var_Y;
   delaiA = 5000 - 10*abs(freqY);
-  unsigned long now = micros();
-  delaiAms = (unsigned long) delaiA;
-  if (now - previousStep >= delaiAms){
-    return now
+  if (delaiA <= minDelay){
+    delaiA = minDelay;
   }
-  else {
-    return previousStep
+  else if (delaiA >= maxDelay){
+    delaiA = maxDelay;
+  }
+  delaiAus = (unsigned long) delaiA;
+  unsigned long now = micros();
+  if (now - previousLeftStep >= delaiAus){
+    digitalWrite(Slp,HIGH);
+    if (freqY >= 0){
+      digitalWrite(DirA, HIGH);
+    }
+    else {
+      digitalWrite(DirA,LOW);
+    }
+    previousLeftState ~= previousLeftState
+    digitalWrite(PulseA, previousLeftState);
+
+    previousLeftStep = now
   }
 }
 
 void loop()
 {
-  val_var_X = analogRead(X_pin);
-  val_var_Y = analogRead(Y_pin);
-  val_sw = analogRead(SW_pin);
-  freqY = val_var_Y - init_var_Y;
-  delaiA = 5000 - 10*abs(freqY);
-  if (delaiA <= minDelay){
-    digitalWrite(Slp,HIGH);
-    if (freqY >= 0){
-      digitalWrite(DirA,HIGH);
-      digitalWrite(ledPin,HIGH);
-      digitalWrite(PulseA,HIGH);
-      delayMicroseconds(minDelay);
-      digitalWrite(PulseA,LOW);
-    }
-    else {
-      digitalWrite(DirA,LOW);
-      digitalWrite(ledPin,HIGH);
-      digitalWrite(PulseA,HIGH);
-      delayMicroseconds(minDelay);
-      digitalWrite(PulseA,LOW);
-    }
-
-    delayMicroseconds(minDelay);
-  }
-  else if (delaiA >= 2000){
-    digitalWrite(Slp,LOW);
-    digitalWrite(ledPin,HIGH);
-    delay(200);
-    digitalWrite(ledPin,LOW);
-    delay(200);
-  }
-  else {
-    digitalWrite(Slp,HIGH);
-    if (freqY >= 0){
-      digitalWrite(DirA,HIGH);
-      digitalWrite(ledPin,HIGH);
-      digitalWrite(PulseA,HIGH);
-      delayMicroseconds(delaiA);
-      digitalWrite(PulseA,LOW);
-    }
-    else {
-      digitalWrite(DirA,LOW);
-      digitalWrite(ledPin,HIGH);
-      digitalWrite(PulseA,HIGH);
-      delayMicroseconds(delaiA);
-      digitalWrite(PulseA,LOW);
-    }
-    delayMicroseconds(delaiA);
-  }
+  ComputeWheelStep()
+  delayMicroseconds(20)
   //Serial.println(freqY);
 
 }

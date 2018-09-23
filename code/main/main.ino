@@ -16,6 +16,7 @@ int freqY = 0;
 int minDelay = 200;
 int maxDelay = 2000;
 
+
 int ledPin = 13;  // LED Integree
 
 unsigned long previousLeftStep = 0;
@@ -52,7 +53,10 @@ void ComputeWheelStep(){
   }
   else if (delaiA >= maxDelay){
     delaiA = maxDelay;
+    
   }
+
+unsigned long delaiAus = 0;
   delaiAus = (unsigned long) delaiA;
   unsigned long now = micros();
   if (now - previousLeftStep >= delaiAus){
@@ -63,17 +67,18 @@ void ComputeWheelStep(){
     else {
       digitalWrite(DirA,LOW);
     }
-    previousLeftState ~= previousLeftState
+    
+    previousLeftState = !previousLeftState; // etait = ~ previousLeftState;
     digitalWrite(PulseA, previousLeftState);
 
-    previousLeftStep = now
+    previousLeftStep = now;
   }
 }
 
 void loop()
 {
-  ComputeWheelStep()
-  delayMicroseconds(20)
+  ComputeWheelStep();
+  delayMicroseconds(20);
   //Serial.println(freqY);
 
 }

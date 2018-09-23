@@ -48,30 +48,28 @@ void ComputeWheelStep(){
   // compute delay
   freqY = val_var_Y - init_var_Y;
   delaiA = 5000 - 10*abs(freqY);
-  if (delaiA <= minDelay){
-    delaiA = minDelay;
-  }
-  else if (delaiA >= maxDelay){
-    delaiA = maxDelay;
-    
-  }
-
-unsigned long delaiAus = 0;
-  delaiAus = (unsigned long) delaiA;
-  unsigned long now = micros();
-  if (now - previousLeftStep >= delaiAus){
-    digitalWrite(Slp,HIGH);
-    if (freqY >= 0){
-      digitalWrite(DirA, HIGH);
+  if (delaiA <= maxDelay){
+    if (delaiA <= minDelay){
+      delaiA = minDelay;
     }
-    else {
-      digitalWrite(DirA,LOW);
-    }
-    
-    previousLeftState = !previousLeftState; // etait = ~ previousLeftState;
-    digitalWrite(PulseA, previousLeftState);
 
-    previousLeftStep = now;
+    unsigned long delaiAus = 0;
+    delaiAus = (unsigned long) delaiA;
+    unsigned long now = micros();
+    if (now - previousLeftStep >= delaiAus){
+      digitalWrite(Slp,HIGH);
+      if (freqY >= 0){
+        digitalWrite(DirA, HIGH);
+      }
+      else {
+        digitalWrite(DirA,LOW);
+      }
+
+      previousLeftState = !previousLeftState; // etait = ~ previousLeftState;
+      digitalWrite(PulseA, previousLeftState);
+
+      previousLeftStep = now;
+    }
   }
 }
 

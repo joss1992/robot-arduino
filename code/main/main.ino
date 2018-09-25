@@ -31,9 +31,9 @@ bool previousLeftState = false;         // State of last step
 
 /* MOTOR B */
 // pins
-int PulseB = 7;                         // Borne Pulse Motor B
-int DirB = 6;                           // Borne Dir Motor B
-int SlpB = 5;                           // Borne Sleep du Driver Motor B
+int PulseB = 12;                         // Borne Pulse Motor B
+int DirB = 11;                           // Borne Dir Motor B
+int SlpB = 10;                           // Borne Sleep du Driver Motor B
 // variables
 int sensB = -1;                         // Direction Motor B
 unsigned long previousRightStep = 0;    // Time of last step
@@ -51,6 +51,7 @@ int val_var_X = 0;
 int val_var_Y = 0;
 int init_var_X = 0;
 int init_var_Y = 0;
+int Slp = 0;
 
 /* Led */
 // pin
@@ -103,7 +104,7 @@ void ComputeWheelStep(unsigned long previousStep, bool previousState, int dir, i
     }
     // convert int delay into unsigned long type (to handle big numbers)
     unsigned long delaius;
-    delaius = (unsigned long) delaiA;
+    delaius = (unsigned long) delai;
     unsigned long now = micros();
     // if last step is far enough, make new step
     if (now - previousStep >= delaius){

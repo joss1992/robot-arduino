@@ -1,20 +1,41 @@
-/* Engine A */
+/*Arduino pro mini :
+
+Arduino Pro Mini Board has 14 digital pins that can be used as input or output, where the pins work at the 5V voltage, 
+and each pin can provide or receive 20mA current, and has pull-up resistance of about 20-50k ohm (by default in Disconnect position). 
+The maximum value is 40mA, which is avoided as much as possible to avoid damage to the microcontroller chip
+Some pins that have special functions on Arduino pro mini are as follows.
+
+- Serial, consisting of 2 pins: pin 0 (RX) and pin 1 (TX) used to receive (RX) and send (TX) serial data.
+- External Interrupts, ie pin 2 and pin 3. Both pins can be used to enable interrupts. Use the attachInterrupt () function
+- PWM: Pin 3, 5, 6, 9, 10, and 11 provide an 8-bit PWM output using the analogWrite () function
+- SPI: Pin 10 (SS), 11 (MOSI), 12 (MISO), and 13 (SCK) support SPI communications using the SPI Library
+- LED: Pin 13. On pin 13 connected built-in led controlled by digital pin no 13.
+
+The Arduino Pro Mini has 8 analog inputs, marked A0 through A7. Each of these analog pins has 10 bits resolution (so it can have 1024 values).
+By default, the pins are measured from ground to 5V, but can also use REF pins by using the analogReference () function.
+
+In addition to the Analog A6 and A7 Pin can not be used as a digital pin, just as analog. Some other pins on this board are as follows.
+
+I2C: Pin A4 (SDA) and A5 (SCL). This pin supports I2C (TWI) communication using Wire Library.
+Reset. Connect to LOW to reset the microcontroller. Usually used to be connected with switches used as a reset button.*/
+
+/* MOTOR A */
 // pins
-int PulseA = 4;                         // Borne Pulse
-int DirA = 3;                           // Borne Dir
-int SlpA = 2;                           // Borne Sleep
+int PulseA = 4;                         // Borne Pulse motor A
+int DirA = 3;                           // Borne Dir motor A
+int SlpA = 2;                           // Borne Sleep motor A
 // Variables
-int sensA = 1;                          // Direction
+int sensA = 1;                          // Direction Motor B
 unsigned long previousLeftStep = 0;     // Time of last step
 bool previousLeftState = false;         // State of last step
 
-/* Engine B */
+/* MOTOR B */
 // pins
-int PulseB = 7;                         // Borne Pulse
-int DirB = 6;                           // Borne Dir
-int SlpB = 5;                           // Borne Sleep du Driver
+int PulseB = 7;                         // Borne Pulse Motor B
+int DirB = 6;                           // Borne Dir Motor B
+int SlpB = 5;                           // Borne Sleep du Driver Motor B
 // variables
-int sensB = -1;                         // Direction
+int sensB = -1;                         // Direction Motor B
 unsigned long previousRightStep = 0;    // Time of last step
 bool previousRightState = false;        // State of last step
 

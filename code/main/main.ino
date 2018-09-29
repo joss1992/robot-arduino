@@ -1,7 +1,7 @@
 /*Arduino pro mini :
 
-Arduino Pro Mini Board has 14 digital pins that can be used as input or output, where the pins work at the 5V voltage, 
-and each pin can provide or receive 20mA current, and has pull-up resistance of about 20-50k ohm (by default in Disconnect position). 
+Arduino Pro Mini Board has 14 digital pins that can be used as input or output, where the pins work at the 5V voltage,
+and each pin can provide or receive 20mA current, and has pull-up resistance of about 20-50k ohm (by default in Disconnect position).
 The maximum value is 40mA, which is avoided as much as possible to avoid damage to the microcontroller chip
 Some pins that have special functions on Arduino pro mini are as follows.
 
@@ -83,7 +83,10 @@ void setup()
 }
 
 
-void ComputeWheelStep(unsigned long previousStep, bool previousState, int dir, int sens, int pulse){
+bool ComputeWheelStep(unsigned long now, unsigned long previousStep, bool previousState, int dir, int sens, int pulse){
+  // result variable
+  bool res = false;
+
   // read joystick values
   val_var_X = analogRead(X_pin);
   val_var_Y = analogRead(Y_pin);
@@ -105,7 +108,6 @@ void ComputeWheelStep(unsigned long previousStep, bool previousState, int dir, i
     // convert int delay into unsigned long type (to handle big numbers)
     unsigned long delaius;
     delaius = (unsigned long) delai;
-    unsigned long now = micros();
     // if last step is far enough, make new step
     if (now - previousStep >= delaius){
       digitalWrite(Slp,HIGH);
@@ -117,21 +119,34 @@ void ComputeWheelStep(unsigned long previousStep, bool previousState, int dir, i
         digitalWrite(dir,LOW);
       }
       // execute the step
-      previousState = !previousState; // etait = ~ previousLeftState;
+      //previousState = !previousState; // etait = ~ previousLeftState;
       digitalWrite(pulse, previousState);
       // update last step time
       // THIS MAY CAUSE A FAIL, IDK IF THE previousStep variable is updated globally
-      previousStep = now;
+      //previousStep = now;
+      res = true;
     }
   }
+  return res;
 }
 
 void loop()
 {
+  // get current time
+  unsigned long now = micros();
   // Compute step for left wheel
-  ComputeWheelStep(previousLeftStep, previousLeftState, DirA, sensA, PulseA);
+  bool moveLeft = ComputeWheelStep(now, previousLeftStep, previousLeftState, DirA, sensA, PulseA);
+  if (moveLeft){
+    previousLeftStep = now;
+    previousLeftState = !previousLeftState;
+  }
   // Compute step for right wheel
-  ComputeWheelStep(previousRightStep, previousRightState, DirB, sensB, PulseB);
+  bool moveRight = ComputeWheelStep(now, previousRightStep, previousRightState, DirB, sensB, PulseB);
+  if (moveRight){
+    previousRightStep = now;
+    previousRightState = !previousRightState;
+  }
+  // wait before next iteration
   delayMicroseconds(20);
   //Serial.println(freqY);
 

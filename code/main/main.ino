@@ -45,6 +45,10 @@ int SW_pin = A2;  // Switch
 int X_pin = A0;  // Borne VAR X du Switch
 int Y_pin = A1;  // Borne VAR X du Switch
 
+/* LED */
+// pins
+int LedPIN = 13;  // Switch
+
 // variables
 int val_sw = 0;
 int val_var_X = 0;
@@ -58,9 +62,10 @@ int Slp = 0;
 int ledPin = 13;  // LED Integree
 
 /* Global variables */
-int freqY = 0;        // frequency between to steps of the engines, to be computed
-int minDelay = 200;   // minimum delay between engine steps
-int maxDelay = 2000;  // maximum delay between engine steps (above=no speed)
+int freqX = 0;
+int freqY = 0;// frequency between to steps of the engines, to be computed
+int minDelay = 50;   // minimum delay between engine steps
+int maxDelay = 4900;  // maximum delay between engine steps (above=no speed)
 
 void setup()
 {
@@ -72,8 +77,15 @@ void setup()
   // setup engine pins
   pinMode(PulseA,OUTPUT);
   pinMode(DirA,OUTPUT);
-  pinMode(ledPin, OUTPUT);
-  pinMode(Slp, OUTPUT);
+  pinMode(SlpA, OUTPUT);
+
+  // setup engine pins
+  pinMode(PulseB,OUTPUT);
+  pinMode(DirB,OUTPUT);
+  pinMode(SlpB, OUTPUT);
+  
+   // setup led pin
+  pinMode(LedPIN, OUTPUT);
 
   // get initial joystick values
   init_var_X = analogRead(X_pin);
@@ -88,19 +100,20 @@ bool ComputeWheelStep(unsigned long now, unsigned long previousStep, bool previo
   bool res = false;
 
   // read joystick values
-  val_var_X = analogRead(X_pin);
-  val_var_Y = analogRead(Y_pin);
+  val_var_X = analogRead(X_pin); // varie de 0 à 1023
+  val_var_Y = analogRead(Y_pin);// varie de 0 à 1023
   val_sw = analogRead(SW_pin);
 
   // compute frequency
-  freqY = val_var_Y - init_var_Y;
-
+  freqX = val_var_X - init_var_X; // varie de -511 à 512
+  freqY = val_var_Y - init_var_Y; // varie de -511 à 512
+  
   // infer engines steps delay from frequency
   int delai;
-  delai = 5000 - 10*abs(freqY);
+  delai = maxDelay + 100 - 10*abs(freqY)- 10*sens*freqX;
 
   // if delay small enough, move
-  if (delai <= maxDelay){
+  if ((abs(freqX) > 50) || ( abs(freqY) > 50)){
     // if delay too small, threshold it
     if (delai <= minDelay){
       delai = minDelay;
@@ -112,7 +125,7 @@ bool ComputeWheelStep(unsigned long now, unsigned long previousStep, bool previo
     if (now - previousStep >= delaius){
       digitalWrite(Slp,HIGH);
       // choose the direction of the step
-      if (sens*freqY >= 0){
+      if (sens*(freqY+freqX) >= 0){
         digitalWrite(dir, HIGH);
       }
       else {
@@ -129,6 +142,16 @@ bool ComputeWheelStep(unsigned long now, unsigned long previousStep, bool previo
   }
   else{  digitalWrite(Slp, LOW);} //  <---------------------------------------------------- Ajout ici
   return res;
+
+
+  digitalWrite(LedPIN, HIGH);
+  delay(150);
+  digitalWrite(LedPIN, LOW);
+  delay(100);
+  digitalWrite(LedPIN, HIGH);
+  delay(150);
+  digitalWrite(LedPIN, LOW);
+  delay(100);
 }
 
 void loop()
@@ -148,7 +171,7 @@ void loop()
     previousRightState = !previousRightState;
   }
   // wait before next iteration
-  delayMicroseconds(20);
+  delayMicroseconds(10);
   //Serial.println(freqY);
 
 }

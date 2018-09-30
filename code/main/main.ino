@@ -1,29 +1,29 @@
-/*Arduino pro mini :
+/*
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Arduino Pro Mini Board has 14 digital pins that can be used as input or output, where the pins work at the 5V voltage,
-and each pin can provide or receive 20mA current, and has pull-up resistance of about 20-50k ohm (by default in Disconnect position).
-The maximum value is 40mA, which is avoided as much as possible to avoid damage to the microcontroller chip
-Some pins that have special functions on Arduino pro mini are as follows.
+                                              ______________________________________________
+                                             |                                              |  
+                ^ +Y                         |                      /\                      |  
+                |                      ___   |     LEFT            /  \         RIGHT       |   ___
+              __|__                   /   \  |  ___________       /    \      ___________   |  /   \
+             /  |  \                  |   |  | |  PINS A   |     /__  __\    |   PINS B  |  |  |   |
+            /       \                 |MOT|__| |DirA = 10  |        ||       |DirB = 2   |  |__|MOT|
+    -X ----| - -|- - |-----> +X       | A |--| |SlpA = 11  |        ||       |SlpB = 3   |  |--| B |
+            \       /                 |   |  | |PulseA = 12|        ||       |PulseB = 4 |  |  |   |
+             \__|__/                  \___/  | '-----------'        ||       '-----------'  |  \___/
+                |                            |                      ||                      |
+                | -Y                         |                                              |  
+                                             |______________________________________________|  
 
-- Serial, consisting of 2 pins: pin 0 (RX) and pin 1 (TX) used to receive (RX) and send (TX) serial data.
-- External Interrupts, ie pin 2 and pin 3. Both pins can be used to enable interrupts. Use the attachInterrupt () function
-- PWM: Pin 3, 5, 6, 9, 10, and 11 provide an 8-bit PWM output using the analogWrite () function
-- SPI: Pin 10 (SS), 11 (MOSI), 12 (MISO), and 13 (SCK) support SPI communications using the SPI Library
-- LED: Pin 13. On pin 13 connected built-in led controlled by digital pin no 13.
 
-The Arduino Pro Mini has 8 analog inputs, marked A0 through A7. Each of these analog pins has 10 bits resolution (so it can have 1024 values).
-By default, the pins are measured from ground to 5V, but can also use REF pins by using the analogReference () function.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-In addition to the Analog A6 and A7 Pin can not be used as a digital pin, just as analog. Some other pins on this board are as follows.
-
-I2C: Pin A4 (SDA) and A5 (SCL). This pin supports I2C (TWI) communication using Wire Library.
-Reset. Connect to LOW to reset the microcontroller. Usually used to be connected with switches used as a reset button.*/
 
 /* MOTOR A */
 // pins
-int PulseA = 4;                         // Borne Pulse motor A
-int DirA = 3;                           // Borne Dir motor A
-int SlpA = 2;                           // Borne Sleep motor A
+int DirA = 10;                           // Borne Dir motor A
+int SlpA = 11;                           // Borne Sleep motor A
+int PulseA = 12;                         // Borne Pulse motor A    <---------------------------------------------------- Changement no de pins
 // Variables
 int sensA = 1;                          // Direction Motor B
 unsigned long previousLeftStep = 0;     // Time of last step
@@ -31,9 +31,9 @@ bool previousLeftState = false;         // State of last step
 
 /* MOTOR B */
 // pins
-int PulseB = 12;                         // Borne Pulse Motor B
-int DirB = 11;                           // Borne Dir Motor B
-int SlpB = 10;                           // Borne Sleep du Driver Motor B
+int DirB = 2;                           // Borne Dir Motor B
+int SlpB = 3;                           // Borne Sleep du Driver Motor B
+int PulseB = 4;                         // Borne Pulse Motor B   <---------------------------------------------------- Changement no de pins
 // variables
 int sensB = -1;                         // Direction Motor B
 unsigned long previousRightStep = 0;    // Time of last step
@@ -83,7 +83,7 @@ void setup()
 }
 
 
-bool ComputeWheelStep(unsigned long now, unsigned long previousStep, bool previousState, int dir, int sens, int pulse){
+bool ComputeWheelStep(unsigned long now, unsigned long previousStep, bool previousState, int dir, int sens, int pulse, int Slp){
   // result variable
   bool res = false;
 
@@ -127,6 +127,7 @@ bool ComputeWheelStep(unsigned long now, unsigned long previousStep, bool previo
       res = true;
     }
   }
+  else{  digitalWrite(Slp, LOW);} //  <---------------------------------------------------- Ajout ici
   return res;
 }
 
@@ -135,13 +136,13 @@ void loop()
   // get current time
   unsigned long now = micros();
   // Compute step for left wheel
-  bool moveLeft = ComputeWheelStep(now, previousLeftStep, previousLeftState, DirA, sensA, PulseA);
+  bool moveLeft = ComputeWheelStep(now, previousLeftStep, previousLeftState, DirA, sensA, PulseA, SlpA);
   if (moveLeft){
     previousLeftStep = now;
     previousLeftState = !previousLeftState;
   }
   // Compute step for right wheel
-  bool moveRight = ComputeWheelStep(now, previousRightStep, previousRightState, DirB, sensB, PulseB);
+  bool moveRight = ComputeWheelStep(now, previousRightStep, previousRightState, DirB, sensB, PulseB, SlpB);
   if (moveRight){
     previousRightStep = now;
     previousRightState = !previousRightState;
